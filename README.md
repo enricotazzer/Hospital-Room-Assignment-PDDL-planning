@@ -27,6 +27,25 @@ cd fast-downward
 
 For detailed installation instructions, visit: https://www.fast-downward.org/ObtainingAndRunningFastDownward
 
+### Install Eclingo (Optional - for Reversibility Checking)
+
+Eclingo is used to check the universal reversibility of actions in the domain.
+
+**Installation:**
+
+```bash
+# Install Anaconda or Miniconda first
+# Then create a conda environment
+conda create --name eclingo python=3.12
+conda activate eclingo
+conda install -c potassco clingo=5.7.1
+
+# Clone and install eclingo
+git clone https://github.com/potassco/eclingo.git
+cd eclingo
+pip install .
+```
+
 ## Usage
 
 ### 1. Create Your Problem Instance
@@ -67,6 +86,32 @@ The planner will output:
 ```bash
 ./fast-downward-24.06.1/fast-downward.py hospital-domain.pddl problem1.pddl --search "astar(lmcut())"
 ```
+
+## Checking Universal Reversibility
+
+To verify that actions in the domain are universally reversible:
+
+### 1. Convert PDDL to ASP
+
+First, translate your PDDL domain and problem to Answer Set Programming format using plasp:
+
+```bash
+plasp translate hospital-domain.pddl problem.pddl > instance.lp
+```
+
+### 2. Run Reversibility Check
+
+Use eclingo with the reversibility encoding:
+
+```bash
+# Check with horizon=2
+eclingo sequential-horizon.uurev.eclingo instance.lp -c horizon=3 -n 0
+
+# Or use clingo
+clingo sequential-horizon.uurev.lp instance.lp -c horizon=3 -n 0
+```
+
+The reversibility encodings check if each action can be reversed within the given horizon.
 
 ## License
 
